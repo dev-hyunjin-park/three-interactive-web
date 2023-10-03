@@ -49,4 +49,15 @@ function init() {
   scene.add(ambientLight);
 
   renderer.render(scene, camera);
+
+  function handleResize() {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    // 렌더러 사이즈에 따라 큐브의 크기도 변하게 된다
+    camera.aspect = window.innerWidth / window.innerHeight;
+    // 창 크기에 따라 카메라의 종횡비 설정도 업데이트 시켜준다
+    camera.updateProjectionMatrix(); // 결과 반영시키기
+    renderer.render(scene, camera); // render
+  }
+
+  window.addEventListener("resize", handleResize);
 }
