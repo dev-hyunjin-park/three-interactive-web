@@ -1,11 +1,15 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import GUI from "lil-gui";
 
 window.addEventListener("load", function () {
   init();
 });
 
 function init() {
+  const options = {
+    color: 0x00ffff,
+  };
   const renderer = new THREE.WebGLRenderer({
     // alpha: true, // 기본 배경화면 없애기
     antialias: true, // 큐브에 계단현상 없애기(매끈하지 않은 표면)
@@ -97,4 +101,16 @@ function init() {
   }
 
   window.addEventListener("resize", handleResize);
+
+  const gui = new GUI();
+
+  //패널에서 컨트롤하고자 하는 속성들 추가
+  // gui.add(cube.position, "y", -3, 3, 0.1); // 객체와 프로퍼티를 전달, 최소, 최대값, 스텝
+  gui.add(cube.position, "y").min(-3).max(3).step(0.1);
+
+  gui.add(cube, "visible");
+
+  gui.addColor(options, "color").onChange((value) => {
+    cube.material.color.set(value);
+  });
 }
