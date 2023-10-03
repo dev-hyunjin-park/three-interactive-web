@@ -25,7 +25,9 @@ function init() {
   );
 
   const geometry = new THREE.BoxGeometry(2, 2, 2); // 크기
-  const material = new THREE.MeshBasicMaterial({ color: 0xcc99ff });
+  // const material = new THREE.MeshBasicMaterial({ color: 0xcc99ff });
+  // MeshBasicMaterial은 조명에 영향을 받지 않는다
+  const material = new THREE.MeshStandardMaterial({ color: 0xcc99ff });
 
   const cube = new THREE.Mesh(geometry, material);
 
@@ -35,5 +37,16 @@ function init() {
   camera.position.set(3, 4, 5); // x, y, z
 
   camera.lookAt(cube.position); // 카메라가 위치에 상관없이 항상 큐브의 위치를 바라보도록 설정한다
+
+  // 특정 방향으로 직사광선, 그림자 음영 표현
+  const directionalLight = new THREE.DirectionalLight(0xf0f0f0, 1);
+  directionalLight.position.set(-1, 2, 3);
+  scene.add(directionalLight);
+
+  // 그림자 밝기 조정
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+  ambientLight.position.set(3, 2, 1);
+  scene.add(ambientLight);
+
   renderer.render(scene, camera);
 }
