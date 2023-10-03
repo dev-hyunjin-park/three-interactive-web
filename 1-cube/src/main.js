@@ -24,46 +24,46 @@ function init() {
     500 // far
   );
 
-  const geometry = new THREE.BoxGeometry(2, 2, 2); // 크기
-  // const material = new THREE.MeshBasicMaterial({ color: 0xcc99ff });
-  // MeshBasicMaterial은 조명에 영향을 받지 않는다
-  const material = new THREE.MeshStandardMaterial({ color: 0xcc99ff });
+  const cubeGeometry = new THREE.IcosahedronGeometry(1); // 크기
+  const cubeMaterial = new THREE.MeshLambertMaterial({
+    color: 0x00ffff,
+    emissive: 0x111111, // 자체적으로 내뿜는 색을 설정
+  });
+  // 빛의 영향을 받는 material 중에 성능적으로 뛰어남
+  const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
-  const cube = new THREE.Mesh(geometry, material);
+  const skeletonGeometray = new THREE.IcosahedronGeometry(2);
+  const skeletonMaterial = new THREE.MeshBasicMaterial({
+    wireframe: true,
+    transparent: true,
+    opacity: 0.2,
+    color: 0xaaaaaa,
+  });
 
-  scene.add(cube);
+  const skeleton = new THREE.Mesh(skeletonGeometray, skeletonMaterial);
+
+  scene.add(cube, skeleton);
+
   // 위치를 지정하지 않으면 원점?에 놓이게 됨 -> 카메라가 담을 수 없는 상태
-  // camera.position.z = 5; // z만 따로 설정
-  camera.position.set(3, 4, 5); // x, y, z
+  camera.position.z = 5; // z만 따로 설정
 
-  camera.lookAt(cube.position); // 카메라가 위치에 상관없이 항상 큐브의 위치를 바라보도록 설정한다
+  // camera.lookAt(cube.position); // 카메라가 위치에 상관없이 항상 큐브의 위치를 바라보도록 설정한다
 
   // 특정 방향으로 직사광선, 그림자 음영 표현
-  const directionalLight = new THREE.DirectionalLight(0xf0f0f0, 1);
-  directionalLight.position.set(-1, 2, 3);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
   scene.add(directionalLight);
-
-  // 그림자 밝기 조정
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
-  ambientLight.position.set(3, 2, 1);
-  scene.add(ambientLight);
 
   const clock = new THREE.Clock();
 
   render(); // 아래의 render 함수 호출
 
   function render() {
-    // 큐브 회전 - radian 1도는 3.14 라디안
-    // cube.rotation.x = THREE.MathUtils.degToRad(45); // degree to radian
-    // cube.rotation.x += 0.01; // 매 프레임마다 0.01 라디안 만큼 회전시킨다
-    // 대부분의 브라우저가 60fps를 지원한다고 하지만 컴퓨터나 브라우저 환경에 따라 차이가 있을 수 있음
-    // --> 어떤 환경에서 보더라도 동일한 속도로 재생되도록 구성한다
+    const elapsedTime = clock.getElapsedTime();
+    cube.rotation.x = elapsedTime;
+    cube.rotation.y = elapsedTime;
 
-    // cube.rotation.x = Date.now() / 1000;
-    cube.rotation.x = clock.getElapsedTime();
-
-    // cube.position.y = Math.sin(cube.rotation.x); // sin은 1과 -1 사이
-    // cube.scale.x = Math.cos(cube.rotation.x); // x축 방향으로 큐브 사이즈를 변경
+    skeleton.rotation.x = elapsedTime * 1.5;
+    skeleton.rotation.y = elapsedTime * 1.5;
 
     renderer.render(scene, camera); // 새로 렌더한다
     requestAnimationFrame(render); // 재귀적으로 호출
