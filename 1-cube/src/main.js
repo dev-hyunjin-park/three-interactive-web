@@ -48,7 +48,26 @@ function init() {
   ambientLight.position.set(3, 2, 1);
   scene.add(ambientLight);
 
-  renderer.render(scene, camera);
+  const clock = new THREE.Clock();
+
+  render(); // 아래의 render 함수 호출
+
+  function render() {
+    // 큐브 회전 - radian 1도는 3.14 라디안
+    // cube.rotation.x = THREE.MathUtils.degToRad(45); // degree to radian
+    // cube.rotation.x += 0.01; // 매 프레임마다 0.01 라디안 만큼 회전시킨다
+    // 대부분의 브라우저가 60fps를 지원한다고 하지만 컴퓨터나 브라우저 환경에 따라 차이가 있을 수 있음
+    // --> 어떤 환경에서 보더라도 동일한 속도로 재생되도록 구성한다
+
+    // cube.rotation.x = Date.now() / 1000;
+    cube.rotation.x = clock.getElapsedTime();
+
+    // cube.position.y = Math.sin(cube.rotation.x); // sin은 1과 -1 사이
+    // cube.scale.x = Math.cos(cube.rotation.x); // x축 방향으로 큐브 사이즈를 변경
+
+    renderer.render(scene, camera); // 새로 렌더한다
+    requestAnimationFrame(render); // 재귀적으로 호출
+  }
 
   function handleResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
