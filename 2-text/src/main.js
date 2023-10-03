@@ -1,12 +1,15 @@
 import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
-import typeface from "./assets/fonts/LOTTERIA DDAG_Regular.json";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import GUI from "lil-gui";
 
 window.addEventListener("load", function () {
   init();
 });
 
 function init() {
+  const gui = new GUI();
   const renderer = new THREE.WebGLRenderer({
     antialias: true, // 큐브에 계단현상 없애기(매끈하지 않은 표면)
   });
@@ -28,26 +31,35 @@ function init() {
   // 위치를 지정하지 않으면 원점?에 놓이게 됨 -> 카메라가 담을 수 없는 상태
   camera.position.z = 5; // z만 따로 설정
 
+  new OrbitControls(camera, renderer.domElement);
+
   // FONT
   const fontLoader = new FontLoader();
 
-  // fontLoader.load(
-  //   "./assets/fonts/LOTTERIA DDAG_Regular.json",
-  //   (font) => {
-  //     // on load
-  //     console.log("load", font);
-  //   },
-  //   (event) => {
-  //     // on progress
-  //     console.log("progress", event);
-  //   },
-  //   (error) => {
-  //     // on error
-  //     console.log("error", error);
-  //   }
-  // );
+  fontLoader.load("./assets/fonts/LOTTERIA DDAG_Regular.json", (font) => {
+    // on load
+    const textGeometry = new TextGeometry("안녕 메롱 우기", {
+      font,
+      size: 0.5,
+      height: 0.1,
+    });
+    const textMaterial = new THREE.MeshPhongMaterial({ color: 0x00c896 });
 
-  const font = fontLoader.parse(typeface);
+    const text = new THREE.Mesh(textGeometry, textMaterial);
+    scene.add(text);
+  });
+
+  // mashphoneMaterial은 빛이 없으면 보이지 않는다. ambientLight 추가
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+  // scene.add(ambientLight);
+
+  const pointLight = new THREE.PointLight(0xffffff, 1);
+  const pointLightHelper = new THREE.PointLightHelper(pointLight, 1);
+
+  pointLight.position.set(3, 0, 2);
+  scene.add(pointLight, pointLightHelper);
+
+  gui.add(pointLight.position, "x").min(-3).max(3).step(0.1);
 
   render(); // 아래의 render 함수 호출
 
