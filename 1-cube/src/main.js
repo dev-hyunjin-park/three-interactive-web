@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 window.addEventListener("load", function () {
   init();
@@ -23,6 +24,21 @@ function init() {
     1, // near
     500 // far
   );
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+
+  controls.autoRotate = true;
+  // controls.autoRotateSpeed = 20;
+  controls.enableDamping = true;
+  // controls.dampingFactor = 0.01;
+  // controls.enableZoom = true; // 카메라 앞뒤 움직임 : 기본값 true
+  // controls.enablePan = true; // 카메라 좌우 움직임 : 기본값 true
+  // controls.maxDistance = 50; // 최대 최소 거리
+  // controls.minDistance = 10;
+  // controls.maxPolarAngle = Math.PI / 2; // 수직 방향 카메라 최대, 최소 값
+  // controls.minPolarAngle = Math.PI / 3;
+  controls.maxAzimuthAngle = Math.PI / 2; // 수평 방향 카메라 최대, 최소 값
+  controls.minAzimuthAngle = Math.PI / 2;
 
   const cubeGeometry = new THREE.IcosahedronGeometry(1); // 크기
   const cubeMaterial = new THREE.MeshLambertMaterial({
@@ -59,13 +75,14 @@ function init() {
 
   function render() {
     const elapsedTime = clock.getElapsedTime();
-    cube.rotation.x = elapsedTime;
-    cube.rotation.y = elapsedTime;
+    // cube.rotation.x = elapsedTime;
+    // cube.rotation.y = elapsedTime;
 
-    skeleton.rotation.x = elapsedTime * 1.5;
-    skeleton.rotation.y = elapsedTime * 1.5;
+    // skeleton.rotation.x = elapsedTime * 1.5;
+    // skeleton.rotation.y = elapsedTime * 1.5;
 
     renderer.render(scene, camera); // 새로 렌더한다
+    controls.update();
     requestAnimationFrame(render); // 재귀적으로 호출
   }
 
@@ -76,6 +93,7 @@ function init() {
     // 창 크기에 따라 카메라의 종횡비 설정도 업데이트 시켜준다
     camera.updateProjectionMatrix(); // 결과 반영시키기
     renderer.render(scene, camera); // render
+    controls.update();
   }
 
   window.addEventListener("resize", handleResize);
