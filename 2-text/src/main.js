@@ -14,6 +14,9 @@ async function init() {
     antialias: true, // 큐브에 계단현상 없애기(매끈하지 않은 표면)
   });
 
+  // shadow 설정하겠음
+  renderer.shadowMap.enabled = true;
+
   // 캔버스 크기 조정
   renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -62,6 +65,7 @@ async function init() {
   textMaterial.map = textTexture;
 
   const text = new THREE.Mesh(textGeometry, textMaterial);
+  text.castShadow = true;
   scene.add(text);
 
   // Plane: spotlight 확인을 위한 판떼기 만들기
@@ -69,6 +73,7 @@ async function init() {
   const planeMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.position.z = -10;
+  plane.receiveShadow = true;
   scene.add(plane);
 
   // ambientlight
@@ -84,6 +89,11 @@ async function init() {
     0.2, // 감쇠하는 정도
     0.5 // 거리에 따라 빛이 어두워지는 양
   );
+  spotLight.castShadow = true;
+  spotLight.shadow.mapSize.width = 1024;
+  spotLight.shadow.mapSize.height = 1024;
+  // 그림자를 표현할 맵의 사이즈. 디폴트 512. 2의 제곱 값
+  spotLight.shadow.radius = 10;
 
   spotLight.position.set(0, 0, 3); // spotlight 위치
   spotLight.target.position.set(0, 0, -3); // 빛의 타겟 지점
@@ -116,6 +126,14 @@ async function init() {
   spotLightFolder.add(spotLight, "decay").min(0).max(10).step(0.01);
 
   spotLightFolder.add(spotLight, "penumbra").min(0).max(1).step(0.01);
+
+  // blur 효과 > radius
+  spotLightFolder
+    .add(spotLight.shadow, "radius")
+    .min(1)
+    .max(20)
+    .step(0.01)
+    .name("shodow.radius");
 
   render(); // 아래의 render 함수 호출
 
