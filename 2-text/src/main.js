@@ -60,6 +60,7 @@ async function init() {
   });
   const textureLoader = new THREE.TextureLoader().setPath("./assets/textures/"); // base path 적용
   const textTexture = textureLoader.load("holographic2.jpg");
+  const spotLightTexture = textureLoader.load("gradient.jpg");
 
   // textureLoader는 loadAsync 쓰지 않더라도 바로 texture 인스턴스를 반환해준다
   textMaterial.map = textTexture;
@@ -97,6 +98,9 @@ async function init() {
 
   spotLight.position.set(0, 0, 3); // spotlight 위치
   spotLight.target.position.set(0, 0, -3); // 빛의 타겟 지점
+
+  spotLight.map = spotLightTexture;
+
   scene.add(spotLight, spotLight.target);
 
   window.addEventListener("mousemove", (event) => {
