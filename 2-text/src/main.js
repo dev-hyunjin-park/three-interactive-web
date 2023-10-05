@@ -44,21 +44,31 @@ async function init() {
     font,
     size: 0.5,
     height: 0.1,
+    bevelEnabled: true,
+    bevelSegments: 5,
+    bevelSize: 0.02,
+    bevelThickness: 0.02,
   });
-  const textMaterial = new THREE.MeshPhongMaterial({ color: 0x00c896 });
+
+  textGeometry.center();
+
+  const textMaterial = new THREE.MeshPhongMaterial({
+    // shininess: 150,
+    // specular: new THREE.Color(0x333333),
+  });
+  const textureLoader = new THREE.TextureLoader().setPath("./assets/textures"); // base path 적용
+
+  const textTexture = textureLoader.load("holographic.jpg");
+  // textureLoader는 loadAsync 쓰지 않더라도 바로 texture 인스턴스를 반환해준다
+  textMaterial.map = textTexture;
 
   const text = new THREE.Mesh(textGeometry, textMaterial);
   scene.add(text);
 
-  // mashphoneMaterial은 빛이 없으면 보이지 않는다. ambientLight 추가
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-  // scene.add(ambientLight);
-
   const pointLight = new THREE.PointLight(0xffffff, 1);
-  const pointLightHelper = new THREE.PointLightHelper(pointLight, 1);
 
   pointLight.position.set(3, 0, 2);
-  scene.add(pointLight, pointLightHelper);
+  scene.add(pointLight);
 
   gui.add(pointLight.position, "x").min(-3).max(3).step(0.1);
 
