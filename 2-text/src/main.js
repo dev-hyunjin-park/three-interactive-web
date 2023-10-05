@@ -2,6 +2,9 @@ import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import GUI from "lil-gui";
 
 window.addEventListener("load", function () {
@@ -139,10 +142,44 @@ async function init() {
     .step(0.01)
     .name("shodow.radius");
 
+  // effect composer: 후처리 효과
+  const composer = new EffectComposer(renderer);
+
+  const renderPass = new RenderPass(scene, camera);
+
+  composer.addPass(renderPass);
+
+  const unrealBloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    1.2,
+    1,
+    0
+  );
+
+  composer.addPass(unrealBloomPass);
+
+  const unrealBloomPassFolder = gui.addFolder("UnrealBloomPass");
+
+  unrealBloomPassFolder
+    .add(unrealBloomPass, "strength")
+    .min(0)
+    .max(3)
+    .step(0.01);
+
+  unrealBloomPassFolder.add(unrealBloomPass, "radius").min(0).max(1).step(0.01);
+
+  unrealBloomPassFolder
+    .add(unrealBloomPass, "threshold")
+    .min(0)
+    .max(1)
+    .step(0.01);
+
   render(); // 아래의 render 함수 호출
 
   function render() {
-    renderer.render(scene, camera); // 새로 렌더한다
+    // renderer.render(scene, camera); // 새로 렌더한다
+    // -> 이제 렌더러가 렌더를 진행하는 게 아닌, 컴포저를 통해 렌더링을 진행한다
+    composer.render();
     requestAnimationFrame(render); // 재귀적으로 호출
   }
 
