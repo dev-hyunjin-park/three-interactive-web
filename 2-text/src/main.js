@@ -28,8 +28,7 @@ async function init() {
     500 // far
   );
 
-  // 위치를 지정하지 않으면 원점?에 놓이게 됨 -> 카메라가 담을 수 없는 상태
-  camera.position.z = 5; // z만 따로 설정
+  camera.position.set(0, 1, 5);
 
   new OrbitControls(camera, renderer.domElement);
 
@@ -40,7 +39,7 @@ async function init() {
     "./assets/fonts/LOTTERIA DDAG_Regular.json"
   );
 
-  const textGeometry = new TextGeometry("안녕 메롱 우기", {
+  const textGeometry = new TextGeometry("안녕 메롱 우기바보바보바보", {
     font,
     size: 0.5,
     height: 0.1,
@@ -53,29 +52,73 @@ async function init() {
   textGeometry.center();
 
   const textMaterial = new THREE.MeshPhongMaterial({
-    // shininess: 150,
-    // specular: new THREE.Color(0x333333),
+    shininess: 50,
+    specular: new THREE.Color(0x333333),
   });
-  const textureLoader = new THREE.TextureLoader().setPath("./assets/textures"); // base path 적용
+  const textureLoader = new THREE.TextureLoader().setPath("./assets/textures/"); // base path 적용
+  const textTexture = textureLoader.load("holographic2.jpg");
 
-  const textTexture = textureLoader.load("holographic.jpg");
   // textureLoader는 loadAsync 쓰지 않더라도 바로 texture 인스턴스를 반환해준다
   textMaterial.map = textTexture;
 
   const text = new THREE.Mesh(textGeometry, textMaterial);
   scene.add(text);
 
-  const pointLight = new THREE.PointLight(0xffffff, 1);
+  // Plane: spotlight 확인을 위한 판떼기 만들기
+  const planeGeometry = new THREE.PlaneGeometry(2000, 2000);
+  const planeMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  plane.position.z = -10;
+  scene.add(plane);
 
-  pointLight.position.set(3, 0, 2);
-  scene.add(pointLight);
+  // ambientlight
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+  scene.add(ambientLight);
 
-  gui.add(pointLight.position, "x").min(-3).max(3).step(0.1);
+  // spotlight
+  const spotLight = new THREE.SpotLight(
+    0xffffff, // 빛의 색상
+    2.5, // 강도
+    30, // 거리
+    Math.PI * 0.25, // 퍼지는 각도
+    0.2, // 감쇠하는 정도
+    0.5 // 거리에 따라 빛이 어두워지는 양
+  );
+
+  spotLight.position.set(0, 0, 3); // spotlight 위치
+  spotLight.target.position.set(0, 0, -3); // 빛의 타겟 지점
+  scene.add(spotLight, spotLight.target);
+
+  const spotlightHelper = new THREE.SpotLightHelper(spotLight);
+  scene.add(spotlightHelper);
+
+  // gui
+  const spotLightFolder = gui.addFolder("SpotLight");
+  // angle: 각도에 따라 빛이 퍼지는 정도가 달라짐
+  spotLightFolder
+    .add(spotLight, "angle")
+    .min(0)
+    .max(Math.PI / 2)
+    .step(0.01);
+
+  spotLightFolder
+    .add(spotLight.position, "z")
+    .min(1)
+    .max(10)
+    .step(0.01)
+    .name("position.z");
+
+  spotLightFolder.add(spotLight, "distance").min(1).max(30).step(0.01);
+
+  spotLightFolder.add(spotLight, "decay").min(0).max(10).step(0.01);
+
+  spotLightFolder.add(spotLight, "penumbra").min(0).max(1).step(0.01);
 
   render(); // 아래의 render 함수 호출
 
   function render() {
     renderer.render(scene, camera); // 새로 렌더한다
+    spotlightHelper.update(); // angle이 바뀔 때마다 spotLightHelper의 각도도 업데이트
     requestAnimationFrame(render); // 재귀적으로 호출
   }
 
