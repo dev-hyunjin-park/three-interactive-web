@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import Card from "./Card";
 
 window.addEventListener("load", function () {
   init();
@@ -12,21 +13,11 @@ function init() {
 
   // 캔버스 크기 조정
   renderer.setSize(window.innerWidth, window.innerHeight);
-  // renderer.setClearAlpha(0.5); //캔버스 투명도 조절
-  renderer.setClearColor(0x00aaff, 0.3); // 배경색, 알파값 지정
 
   document.body.appendChild(renderer.domElement); // 캔버스 요소(렌더러)를 domElem에 추가해준다
 
   // 3d 컨텐츠를 담을 씬
   const scene = new THREE.Scene();
-
-  const textureLoader = new THREE.TextureLoader();
-  const texture = textureLoader.load(
-    "https://images.unsplash.com/photo-1599209248411-5124adbb1da2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c2t5JTIwdGV4dHVyZXxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80"
-  );
-
-  // scene.background = new THREE.Color(0xffaa00); // scene의 배경색 지정
-  scene.background = texture;
 
   // 원근감을 표현할 수 있는 카메라
   const camera = new THREE.PerspectiveCamera(
@@ -36,8 +27,19 @@ function init() {
     500 // far
   );
 
-  // 위치를 지정하지 않으면 원점?에 놓이게 됨 -> 카메라가 담을 수 없는 상태
-  camera.position.z = 5; // z만 따로 설정
+  camera.position.z = 25;
+
+  const card = new Card({
+    width: 10,
+    height: 15.8,
+    color: "#0077ff",
+  });
+
+  scene.add(card.mesh); // 생성된 mesh를 장면에 추가해준다
+
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+  ambientLight.position.set(-5, -5, -5);
+  scene.add(ambientLight);
 
   render(); // 아래의 render 함수 호출
 
