@@ -7,7 +7,10 @@ class Card {
     const geometry = new THREE.PlaneGeometry(width, height);
 
     // 평면의 색상(표면: 빛과 상호작용하여 물체의 색상, 광택, 투명도 등)을 정의한다
-    const material = new THREE.MeshStandardMaterial({ color });
+    const material = new THREE.MeshStandardMaterial({
+      color,
+      side: THREE.DoubleSide, // material은 성능상 이유로 기본적으로 한 면만 렌더링하도록 되어있다
+    });
 
     // 3d mesh 객체를 생성한다 (geometry, material을 결합해서 실제 3d 객체를 생성)
     const mesh = new THREE.Mesh(geometry, material);
