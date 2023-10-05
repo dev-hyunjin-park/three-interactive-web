@@ -8,7 +8,7 @@ window.addEventListener("load", function () {
   init();
 });
 
-function init() {
+async function init() {
   const gui = new GUI();
   const renderer = new THREE.WebGLRenderer({
     antialias: true, // 큐브에 계단현상 없애기(매끈하지 않은 표면)
@@ -36,18 +36,19 @@ function init() {
   // FONT
   const fontLoader = new FontLoader();
 
-  fontLoader.load("./assets/fonts/LOTTERIA DDAG_Regular.json", (font) => {
-    // on load
-    const textGeometry = new TextGeometry("안녕 메롱 우기", {
-      font,
-      size: 0.5,
-      height: 0.1,
-    });
-    const textMaterial = new THREE.MeshPhongMaterial({ color: 0x00c896 });
+  const font = await fontLoader.loadAsync(
+    "./assets/fonts/LOTTERIA DDAG_Regular.json"
+  );
 
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    scene.add(text);
+  const textGeometry = new TextGeometry("안녕 메롱 우기", {
+    font,
+    size: 0.5,
+    height: 0.1,
   });
+  const textMaterial = new THREE.MeshPhongMaterial({ color: 0x00c896 });
+
+  const text = new THREE.Mesh(textGeometry, textMaterial);
+  scene.add(text);
 
   // mashphoneMaterial은 빛이 없으면 보이지 않는다. ambientLight 추가
   const ambientLight = new THREE.AmbientLight(0xffffff, 1);
