@@ -2,9 +2,22 @@ import * as THREE from "three";
 // const card = new Card({ width: 2, height: 3, color: '#0077ff'... }); // 이런식으로 인스턴스 생성해서 사용한다
 
 class Card {
-  constructor({ width, height, color }) {
-    // plane geometry(평면의 형태) 생성 -> 입력받은 width, height 사용
-    const geometry = new THREE.PlaneGeometry(width, height);
+  constructor({ width, height, radius, color }) {
+    const x = width / 2 - radius;
+    const y = height / 2 - radius;
+    const shape = new THREE.Shape();
+
+    shape
+      .absarc(x, y, radius, Math.PI / 2, 0, true) // absolute arc
+      .lineTo(x + radius, -y)
+      .absarc(x, -y, radius, 0, -Math.PI / 2, true)
+      .lineTo(-x, -(y + radius))
+      .absarc(-x, -y, radius, -Math.PI / 2, Math.PI, true)
+      .lineTo(-(x + radius), y, radius, Math.PI, Math.PI / 2, true)
+      .absarc(-x, y, radius, Math.PI, Math.PI / 2, true);
+
+    // 둥근 모서리를 만들어주기위해 ShapeGeometry로 변경한다
+    const geometry = new THREE.ShapeGeometry(shape);
 
     // 평면의 색상(표면: 빛과 상호작용하여 물체의 색상, 광택, 투명도 등)을 정의한다
     const material = new THREE.MeshStandardMaterial({

@@ -37,6 +37,7 @@ function init() {
   const card = new Card({
     width: 10,
     height: 15.8,
+    radius: 0.5,
     color: "#0077ff",
   });
 
