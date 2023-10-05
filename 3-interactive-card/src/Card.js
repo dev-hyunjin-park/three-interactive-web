@@ -10,6 +10,8 @@ class Card {
     const material = new THREE.MeshStandardMaterial({
       color,
       side: THREE.DoubleSide, // material은 성능상 이유로 기본적으로 한 면만 렌더링하도록 되어있다
+      roughness: 0.3,
+      metalness: 0.5,
     });
 
     // 3d mesh 객체를 생성한다 (geometry, material을 결합해서 실제 3d 객체를 생성)

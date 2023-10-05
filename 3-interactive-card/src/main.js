@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { GUI } from "lil-gui";
 import Card from "./Card";
 
 window.addEventListener("load", function () {
@@ -7,6 +8,7 @@ window.addEventListener("load", function () {
 });
 
 function init() {
+  const gui = new GUI();
   const renderer = new THREE.WebGLRenderer({
     antialias: true, // 큐브에 계단현상 없애기(매끈하지 않은 표면)
     alpha: true, // renderer 배경을 투명하게 처리한다
@@ -40,9 +42,33 @@ function init() {
 
   scene.add(card.mesh); // 생성된 mesh를 장면에 추가해준다
 
+  const cardFolder = gui.addFolder("Card");
+
+  cardFolder
+    .add(card.mesh.material, "roughness")
+    .min(0)
+    .max(1)
+    .step(0.01)
+    .name("material.roughness");
+
+  cardFolder
+    .add(card.mesh.material, "metalness")
+    .min(0)
+    .max(1)
+    .step(0.01)
+    .name("material.metalness");
+
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
   ambientLight.position.set(-5, -5, -5);
   scene.add(ambientLight);
+
+  const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.6);
+  const directionalLight2 = directionalLight1.clone();
+
+  directionalLight1.position.set(1, 1, 3);
+  directionalLight2.position.set(1, 1, -3);
+
+  scene.add(directionalLight1, directionalLight2);
 
   render(); // 아래의 render 함수 호출
 
