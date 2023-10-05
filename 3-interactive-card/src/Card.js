@@ -16,8 +16,11 @@ class Card {
       .lineTo(-(x + radius), y, radius, Math.PI, Math.PI / 2, true)
       .absarc(-x, y, radius, Math.PI, Math.PI / 2, true);
 
-    // 둥근 모서리를 만들어주기위해 ShapeGeometry로 변경한다
-    const geometry = new THREE.ShapeGeometry(shape);
+    // 3차원으로 변경 - ExtrudeGeometry
+    const geometry = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.01, // 두께
+      bevelThickness: 0.1, // 경사면 두께
+    });
 
     // 평면의 색상(표면: 빛과 상호작용하여 물체의 색상, 광택, 투명도 등)을 정의한다
     const material = new THREE.MeshStandardMaterial({
