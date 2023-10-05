@@ -89,8 +89,11 @@ async function init() {
   spotLight.target.position.set(0, 0, -3); // 빛의 타겟 지점
   scene.add(spotLight, spotLight.target);
 
-  const spotlightHelper = new THREE.SpotLightHelper(spotLight);
-  scene.add(spotlightHelper);
+  window.addEventListener("mousemove", (event) => {
+    const x = (event.clientX / window.innerWidth - 0.5) * 5;
+    const y = (event.clientY / window.innerHeight - 0.5) * -5;
+    spotLight.target.position.set(x, y, -3);
+  });
 
   // gui
   const spotLightFolder = gui.addFolder("SpotLight");
@@ -118,7 +121,6 @@ async function init() {
 
   function render() {
     renderer.render(scene, camera); // 새로 렌더한다
-    spotlightHelper.update(); // angle이 바뀔 때마다 spotLightHelper의 각도도 업데이트
     requestAnimationFrame(render); // 재귀적으로 호출
   }
 
