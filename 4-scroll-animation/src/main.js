@@ -27,7 +27,37 @@ function init() {
   );
 
   // 위치를 지정하지 않으면 원점?에 놓이게 됨 -> 카메라가 담을 수 없는 상태
-  camera.position.z = 5; // z만 따로 설정
+  camera.position.set(0, 25, 150);
+
+  const waveGeometry = new THREE.PlaneGeometry(1500, 1500, 150, 150);
+  const waveMaterial = new THREE.MeshStandardMaterial({
+    wireframe: true,
+    color: "#00ffff",
+  });
+
+  const waveHeight = 2.5;
+
+  // z 좌표 값을 직접 변경하는 방법
+  // for (let i = 0; i < waveGeometry.attributes.position.array.length; i += 3) {
+  //   waveGeometry.attributes.position.array[i + 2] +=
+  //     (Math.random() - 0.5) * waveHeight;
+  // }
+  // setZ method 사용하는 방법
+  for (let i = 0; i < waveGeometry.attributes.position.count; i++) {
+    const z =
+      waveGeometry.attributes.position.getZ(i) +
+      (Math.random() - 0.5) * waveHeight;
+    waveGeometry.attributes.position.setZ(i, z);
+  }
+  const wave = new THREE.Mesh(waveGeometry, waveMaterial);
+
+  wave.rotation.x = -Math.PI / 2;
+
+  scene.add(wave);
+
+  const pointLight = new THREE.PointLight(0xffffff, 1);
+  pointLight.position.set(15, 15, 15);
+  scene.add(pointLight);
 
   render(); // 아래의 render 함수 호출
 
