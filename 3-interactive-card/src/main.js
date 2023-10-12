@@ -34,12 +34,22 @@ function init() {
 
   const controls = new OrbitControls(camera, renderer.domElement);
 
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 2.5;
+  controls.rotateSpeed = 0.75; // default 1
+  controls.enableDamping = true; // 커서를 뗐을 때 회전력 유지하려는 관성
+  controls.enableZoom = false;
+  controls.minPolarAngle = Math.PI / 2 - Math.PI / 3; // 수직 방향
+  controls.maxPolarAngle = Math.PI / 2 + Math.PI / 3;
+
   const card = new Card({
     width: 10,
     height: 15.8,
     radius: 0.5,
     color: "#0077ff",
   });
+
+  card.mesh.rotation.z = Math.PI * 0.1;
 
   scene.add(card.mesh); // 생성된 mesh를 장면에 추가해준다
 
@@ -74,6 +84,7 @@ function init() {
   render(); // 아래의 render 함수 호출
 
   function render() {
+    controls.update();
     renderer.render(scene, camera); // 새로 렌더한다
     requestAnimationFrame(render); // 재귀적으로 호출
   }
