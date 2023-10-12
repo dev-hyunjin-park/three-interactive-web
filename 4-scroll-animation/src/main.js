@@ -48,6 +48,7 @@ function init() {
   });
 
   const waveHeight = 2.5;
+  const initialZPositions = [];
 
   // z 좌표 값을 직접 변경하는 방법
   // for (let i = 0; i < waveGeometry.attributes.position.array.length; i += 3) {
@@ -60,6 +61,7 @@ function init() {
       waveGeometry.attributes.position.getZ(i) +
       (Math.random() - 0.5) * waveHeight;
     waveGeometry.attributes.position.setZ(i, z);
+    initialZPositions.push(z);
   }
   const wave = new THREE.Mesh(waveGeometry, waveMaterial);
 
@@ -68,8 +70,12 @@ function init() {
   wave.update = function () {
     const elapsedTime = clock.getElapsedTime();
 
-    for (let i = 0; i < waveGeometry.attributes.position.array.length; i += 3) {
-      waveGeometry.attributes.position.array[i + 2] += elapsedTime * 0.01;
+    for (let i = 0; i < waveGeometry.attributes.position.count; i++) {
+      const z =
+        initialZPositions[i] + Math.sin(elapsedTime * 3 + i ** 2) * waveHeight;
+      waveGeometry.attributes.position.setZ(i, z);
+      // 각 정점마다 시간이 흐르는 속도를 모두 다르게 해주면 파도의 높낮이가 서로 다르게 표현된다
+      // 불규칙성을 위해 i의 거듭제곱의 형태로 곱해준다
     }
     waveGeometry.attributes.position.needsUpdate = true; // update 좌표를 알려준다
   };
