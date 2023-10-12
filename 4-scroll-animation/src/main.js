@@ -1,11 +1,12 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GUI } from "lil-gui";
 
 window.addEventListener("load", function () {
   init();
 });
 
-function init() {
+async function init() {
   const gui = new GUI();
 
   const canvas = document.querySelector("canvas");
@@ -82,6 +83,21 @@ function init() {
 
   scene.add(wave);
 
+  const gltfLoader = new GLTFLoader();
+
+  const gltf = await gltfLoader.loadAsync("./models/ship/scene.gltf");
+  const ship = gltf.scene;
+
+  ship.rotation.y = Math.PI;
+  ship.scale.set(40, 40, 40); // 40배
+
+  // ship에도 애니메이션을 선언해준다
+  ship.update = function () {
+    const elapsedTime = clock.getElapsedTime();
+    ship.position.y = Math.sin(elapsedTime * 3);
+  };
+  scene.add(ship);
+
   const pointLight = new THREE.PointLight(0xffffff, 1);
   pointLight.position.set(15, 15, 15);
   scene.add(pointLight);
@@ -96,6 +112,10 @@ function init() {
 
   function render() {
     wave.update();
+    ship.update();
+
+    camera.lookAt(ship.position); // 카메라가 항상 배의 위치를 바라보도록 고정시킨다
+
     renderer.render(scene, camera); // 새로 렌더한다
     requestAnimationFrame(render); // 재귀적으로 호출
   }
