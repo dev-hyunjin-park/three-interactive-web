@@ -9,6 +9,9 @@ window.addEventListener("load", function () {
 
 function init() {
   const gui = new GUI();
+
+  const COLORS = ["#ff6e6e", "#31e0c1", "#006fff", "#ffd732"];
+
   const renderer = new THREE.WebGLRenderer({
     antialias: true, // 큐브에 계단현상 없애기(매끈하지 않은 표면)
     alpha: true, // renderer 배경을 투명하게 처리한다
@@ -46,10 +49,10 @@ function init() {
     width: 10,
     height: 15.8,
     radius: 0.5,
-    color: "#0077ff",
+    color: COLORS[0],
   });
 
-  card.mesh.rotation.z = Math.PI * 0.1;
+  card.mesh.rotation.z = Math.PI * 0.1; // 카드 기울기 적용
 
   scene.add(card.mesh); // 생성된 mesh를 장면에 추가해준다
 
@@ -99,4 +102,14 @@ function init() {
   }
 
   window.addEventListener("resize", handleResize);
+
+  const container = document.querySelector(".container");
+  COLORS.forEach((color) => {
+    const button = document.createElement("button");
+    button.style.backgroundColor = color;
+    button.addEventListener("click", () => {
+      card.mesh.material.color = new THREE.Color(color);
+    });
+    container.appendChild(button);
+  });
 }
