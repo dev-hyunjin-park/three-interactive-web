@@ -65,6 +65,15 @@ function init() {
 
   wave.rotation.x = -Math.PI / 2;
 
+  wave.update = function () {
+    const elapsedTime = clock.getElapsedTime();
+
+    for (let i = 0; i < waveGeometry.attributes.position.array.length; i += 3) {
+      waveGeometry.attributes.position.array[i + 2] += elapsedTime * 0.01;
+    }
+    waveGeometry.attributes.position.needsUpdate = true; // update 좌표를 알려준다
+  };
+
   scene.add(wave);
 
   const pointLight = new THREE.PointLight(0xffffff, 1);
@@ -75,9 +84,12 @@ function init() {
   directionLight.position.set(-15, 15, 15);
   scene.add(directionLight);
 
+  const clock = new THREE.Clock();
+
   render(); // 아래의 render 함수 호출
 
   function render() {
+    wave.update();
     renderer.render(scene, camera); // 새로 렌더한다
     requestAnimationFrame(render); // 재귀적으로 호출
   }
