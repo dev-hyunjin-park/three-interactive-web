@@ -1,10 +1,13 @@
 import * as THREE from "three";
+import { GUI } from "lil-gui";
 
 window.addEventListener("load", function () {
   init();
 });
 
 function init() {
+  const gui = new GUI();
+
   const canvas = document.querySelector("canvas");
 
   const renderer = new THREE.WebGLRenderer({
@@ -18,7 +21,16 @@ function init() {
 
   // 3d 컨텐츠를 담을 씬
   const scene = new THREE.Scene();
-  // 원근감을 표현할 수 있는 카메라
+
+  // 안개 효과
+  scene.fog = new THREE.Fog(0xf0f0f0, 0.1, 500);
+
+  // scene.fog = new THREE.FogExp2(0xf0f0f0, 0.005);
+  // 카메라에서부터 멀어질 수록 기하급수적으로 짙어짐 >> 현실적인 느낌의 안개
+
+  // gui.add(scene.fog, "near").min(0).max(100).step(0.01);
+  // gui.add(scene.fog, "far").min(100).max(500).step(0.1);
+
   const camera = new THREE.PerspectiveCamera(
     75, // 시야각(field of view)
     window.innerWidth / window.innerHeight, // 카메라 종횡비
@@ -31,7 +43,7 @@ function init() {
 
   const waveGeometry = new THREE.PlaneGeometry(1500, 1500, 150, 150);
   const waveMaterial = new THREE.MeshStandardMaterial({
-    wireframe: true,
+    // wireframe: true,
     color: "#00ffff",
   });
 
@@ -58,6 +70,10 @@ function init() {
   const pointLight = new THREE.PointLight(0xffffff, 1);
   pointLight.position.set(15, 15, 15);
   scene.add(pointLight);
+
+  const directionLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionLight.position.set(-15, 15, 15);
+  scene.add(directionLight);
 
   render(); // 아래의 render 함수 호출
 
