@@ -17,6 +17,8 @@ async function init() {
     canvas,
   });
 
+  renderer.shadowMap.enabled = true;
+
   // 캔버스 크기 조정
   renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -67,6 +69,7 @@ async function init() {
   const wave = new THREE.Mesh(waveGeometry, waveMaterial);
 
   wave.rotation.x = -Math.PI / 2;
+  wave.receiveShadow = true;
 
   wave.update = function () {
     const elapsedTime = clock.getElapsedTime();
@@ -88,6 +91,13 @@ async function init() {
   const gltf = await gltfLoader.loadAsync("./models/ship/scene.gltf");
   const ship = gltf.scene;
 
+  ship.castShadow = true;
+  ship.traverse((object) => {
+    if (object.isMesh) {
+      object.castShadow = true;
+    }
+  });
+
   ship.rotation.y = Math.PI;
   ship.scale.set(40, 40, 40); // 40배
 
@@ -99,10 +109,22 @@ async function init() {
   scene.add(ship);
 
   const pointLight = new THREE.PointLight(0xffffff, 1);
+
+  pointLight.castShadow = true;
+  pointLight.shadow.mapSize.width = 1024; // 그림자 맵의 해상도
+  pointLight.shadow.mapSize.height = 1024; // 그림자 맵의 높이
+  pointLight.shadow.radius = 10; // blur
+
   pointLight.position.set(15, 15, 15);
   scene.add(pointLight);
 
   const directionLight = new THREE.DirectionalLight(0xffffff, 0.8);
+
+  directionLight.castShadow = true;
+  directionLight.shadow.mapSize.width = 1024;
+  directionLight.shadow.mapSize.height = 1024;
+  directionLight.shadow.radius = 10;
+
   directionLight.position.set(-15, 15, 15);
   scene.add(directionLight);
 
