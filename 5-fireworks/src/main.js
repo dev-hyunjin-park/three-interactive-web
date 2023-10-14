@@ -22,10 +22,10 @@ function init() {
     75, // 시야각(field of view)
     window.innerWidth / window.innerHeight, // 카메라 종횡비
     1, // near
-    500 // far
+    10000 // far
   );
 
-  camera.position.z = 5;
+  camera.position.z = 8000;
 
   new OrbitControls(camera, renderer.domElement);
 
@@ -35,6 +35,7 @@ function init() {
   render(); // 아래의 render 함수 호출
 
   function render() {
+    firework.update();
     renderer.render(scene, camera); // 새로 렌더한다
     requestAnimationFrame(render); // 재귀적으로 호출
   }
