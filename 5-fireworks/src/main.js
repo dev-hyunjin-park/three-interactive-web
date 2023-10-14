@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Firework from "./firework";
 
 window.addEventListener("load", function () {
   init();
@@ -28,52 +29,8 @@ function init() {
 
   new OrbitControls(camera, renderer.domElement);
 
-  const geometry = new THREE.BufferGeometry();
-
-  const count = 1000; // 정점의 갯수
-
-  const positions = new Float32Array(count * 3); // 정점의 위치를 담을 배열
-  // 32비트 부동 소수점 숫자 배열. 각 정점의 x,y,z 좌표를 갖는 하나의 배열로 표현됨
-  // 배열의 크기는 count * 3
-
-  const colors = new Float32Array(count * 3); // 랜덤 색상 정보
-
-  // 무작위로 정점의 위치를 설정
-  for (let i = 0; i < count; i++) {
-    positions[i * 3] = THREE.MathUtils.randFloatSpread(10); // 위와 같은 값을 Three.js 내장 함수를 사용해서 구할 수 있음
-    positions[i * 3 + 1] = THREE.MathUtils.randFloatSpread(10);
-    positions[i * 3 + 2] = THREE.MathUtils.randFloatSpread(10);
-
-    // RGB 각 color 채널의 값은 0~1 사이의 실수로 표현된다
-    colors[i * 3] = Math.random();
-    colors[i * 3 + 1] = Math.random();
-    colors[i * 3 + 2] = Math.random();
-  }
-
-  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-  // 정점 위치 데이터를 BufferGeometry의 position 속성에 할당한다
-  // bufferAttribute: Three.js의 내장 클래스로, 정점 데이터를 버퍼에 저장하고 해당 버퍼를 geometry에 연결해준다
-  // position 속성은 정점의 위치 정보를 나타내며, 각 정점은 3개의 값(x,y,z)를 가지고 있음을 나타낸다
-
-  const material = new THREE.PointsMaterial({
-    color: 0xccaaff,
-    size: 0.1,
-    // sizeAttenuation: false, // 원근에 따른 점의 크기 차이를 두지 않겠다
-    vertexColors: true, // 정점의 색상 정보를 사용한다
-  });
-
-  const textureLoader = new THREE.TextureLoader();
-  const texture = textureLoader.load("./assets/textures/particle.png");
-
-  material.alphaMap = texture;
-  material.transparent = true;
-  material.depthWrite = false; // 파티클 머티리얼의 깊이 버퍼(Z-버퍼) 쓰기를 비활성화
-  // 입자들이 서로 깊이(거리)에 상관없이 겹쳐보이도록 하기 위함
-
-  const points = new THREE.Points(geometry, material);
-
-  scene.add(points);
+  const firework = new Firework({ x: 0, y: 0 });
+  scene.add(firework.points);
 
   render(); // 아래의 render 함수 호출
 
