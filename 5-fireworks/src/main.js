@@ -30,7 +30,7 @@ function init() {
 
   const geometry = new THREE.BufferGeometry();
 
-  const count = 10000; // 정점의 갯수
+  const count = 1000; // 정점의 갯수
 
   const positions = new Float32Array(count * 3); // 정점의 위치를 담을 배열
   // 32비트 부동 소수점 숫자 배열. 각 정점의 x,y,z 좌표를 갖는 하나의 배열로 표현됨
@@ -53,9 +53,17 @@ function init() {
 
   const material = new THREE.PointsMaterial({
     color: 0xccaaff,
-    size: 0.01,
+    size: 1,
     // sizeAttenuation: false, // 원근에 따른 점의 크기 차이를 두지 않겠다
   });
+
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load("./assets/textures/particle.png");
+
+  material.alphaMap = texture;
+  material.transparent = true;
+  material.depthWrite = false; // 파티클 머티리얼의 깊이 버퍼(Z-버퍼) 쓰기를 비활성화
+  // 입자들이 서로 깊이(거리)에 상관없이 겹쳐보이도록 하기 위함
 
   const points = new THREE.Points(geometry, material);
 
