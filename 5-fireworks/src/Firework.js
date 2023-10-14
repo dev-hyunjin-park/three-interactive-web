@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 class Firework {
   constructor({ x, y }) {
-    const count = 1000;
+    const count = 1000 + Math.round(Math.random() * 5000); // 1000~6000 개의 랜덤한 파티클 갯수
     const velocity = 10 + Math.random() * 10; // 10-20 사이 랜덤
 
     const particlesGeometry = new THREE.BufferGeometry();
@@ -12,10 +12,14 @@ class Firework {
     for (let i = 0; i < count; i++) {
       const particle = new THREE.Vector3(x, y, 0);
 
-      particle.deltaX = THREE.MathUtils.randFloatSpread(velocity);
-      // velocity가 10이라면 -5와 5 사이의 랜덤 값을 가지게 된다
-      particle.deltaY = THREE.MathUtils.randFloatSpread(velocity);
-      particle.deltaZ = THREE.MathUtils.randFloatSpread(velocity);
+      particle.theta = Math.random() * Math.PI * 2;
+      particle.phi = Math.random() * Math.PI * 2;
+
+      particle.deltaX =
+        velocity * Math.sin(particle.theta) * Math.cos(particle.phi);
+      particle.deltaY =
+        velocity * Math.sin(particle.theta) * Math.sin(particle.phi);
+      particle.deltaZ = velocity * Math.cos(particle.theta);
 
       this.particles.push(particle);
     }
@@ -32,6 +36,7 @@ class Firework {
       transparent: true,
       depthWrite: false,
       color: new THREE.Color(Math.random(), Math.random(), Math.random()),
+      blending: THREE.AdditiveBleanding,
     });
 
     const points = new THREE.Points(particlesGeometry, particlesMaterial);
