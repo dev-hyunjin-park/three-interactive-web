@@ -10,7 +10,6 @@ class Firework {
     const particles = [];
     for (let i = 0; i < count; i++) {
       const particle = new THREE.Vector3(x, y, 0);
-
       particles.push(particle);
     }
 
@@ -25,6 +24,7 @@ class Firework {
       alphaMap: texture,
       transparent: true,
       depthWrite: false,
+      color: new THREE.Color(Math.random(), Math.random(), Math.random()),
     });
 
     const points = new THREE.Points(particlesGeometry, particlesMaterial);
