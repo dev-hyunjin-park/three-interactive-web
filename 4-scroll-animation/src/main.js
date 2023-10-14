@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { GUI } from "lil-gui";
 
 window.addEventListener("load", function () {
@@ -7,7 +9,16 @@ window.addEventListener("load", function () {
 });
 
 async function init() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  const params = {
+    waveColor: "#00ffff",
+    backgroundColor: "#ffffff",
+    fogColor: "#f0f0f0",
+  };
+
   const gui = new GUI();
+  gui.hide();
 
   const canvas = document.querySelector("canvas");
 
@@ -47,7 +58,7 @@ async function init() {
   const waveGeometry = new THREE.PlaneGeometry(1500, 1500, 150, 150);
   const waveMaterial = new THREE.MeshStandardMaterial({
     // wireframe: true,
-    color: "#00ffff",
+    color: params.waveColor,
   });
 
   const waveHeight = 2.5;
@@ -152,4 +163,69 @@ async function init() {
   }
 
   window.addEventListener("resize", handleResize);
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: ".wrapper",
+      start: "top top",
+      end: "bottom bottom", // 애니메이션이 끝나는 시점
+      markers: true, // 브라우저 상단에서 트리거 요소 확인
+      scrub: true,
+    },
+  });
+
+  tl.to(params, {
+    waveColor: "#4268ff",
+    onUpdate: () => {
+      waveMaterial.color = new THREE.Color(params.waveColor);
+    },
+    duration: 1.5,
+  })
+    .to(
+      params,
+      {
+        backgroundColor: "#2a2a2a",
+        onUpdate: () => {
+          scene.background = new THREE.Color(params.backgroundColor);
+        },
+        duration: 1.5,
+      },
+      "<"
+    )
+    .to(
+      params,
+      {
+        fogColor: "#2f2f2f",
+        onUpdate: () => {
+          scene.fog.color = new THREE.Color(params.fogColor);
+        },
+        duration: 2.5,
+      },
+      "<" // 이전 애니메이션이 시작되는 시점에 안개 색상도 함께 변경시키겠다
+    )
+    .to(camera.position, {
+      x: 100,
+      z: -50,
+      duration: 2,
+    })
+    .to(ship.position, {
+      z: 150,
+      duration: 2,
+    })
+    .to(camera.position, {
+      x: 0,
+      y: 50,
+      z: 300,
+      duration: 2,
+    });
+
+  gsap.to(".title", {
+    opacity: 0,
+    scrollTrigger: {
+      trigger: ".wrapper",
+      scrub: true,
+      pin: true, // 위치 고정
+      end: "+=1000", // 현재 스크롤 위치에서 1000 단위만큼 떨어진 위치까지 스크롤해야 트리거가 종료
+    },
+  });
 }
