@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 window.addEventListener("load", function () {
   init();
@@ -26,6 +27,13 @@ async function init() {
 
   // 위치를 지정하지 않으면 원점?에 놓이게 됨 -> 카메라가 담을 수 없는 상태
   camera.position.set(0, 5, 20);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.minDistance = 15;
+  controls.maxDistance = 25;
+  controls.minPolarAngle = Math.PI / 4;
+  controls.maxPolarAngle = Math.PI / 3;
 
   const progressBar = document.querySelector("#progress-bar");
   const progressBarContainer = document.querySelector(
@@ -57,6 +65,8 @@ async function init() {
   render(); // 아래의 render 함수 호출
 
   function render() {
+    controls.update();
+
     renderer.render(scene, camera); // 새로 렌더한다
     requestAnimationFrame(render); // 재귀적으로 호출
   }
