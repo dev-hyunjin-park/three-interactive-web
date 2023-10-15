@@ -27,7 +27,21 @@ async function init() {
   // 위치를 지정하지 않으면 원점?에 놓이게 됨 -> 카메라가 담을 수 없는 상태
   camera.position.set(0, 5, 20);
 
-  const gltfLoader = new GLTFLoader();
+  const progressBar = document.querySelector("#progress-bar");
+  const progressBarContainer = document.querySelector(
+    "#progress-bar-container"
+  );
+
+  const loadingManager = new THREE.LoadingManager();
+
+  loadingManager.onProgress = (url, loaded, total) => {
+    progressBar.value = (loaded / total) * 100;
+  };
+  loadingManager.onLoad = () => {
+    progressBarContainer.style.display = "none";
+  };
+
+  const gltfLoader = new GLTFLoader(loadingManager);
 
   const gltf = await gltfLoader.loadAsync("models/character.gltf");
   const model = gltf.scene;
