@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { GUI } from "lil-gui";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 window.addEventListener("load", function () {
@@ -6,6 +7,7 @@ window.addEventListener("load", function () {
 });
 
 function init() {
+  const gui = new GUI();
   const renderer = new THREE.WebGLRenderer({
     antialias: true, // 큐브에 계단현상 없애기(매끈하지 않은 표면)
   });
@@ -25,7 +27,7 @@ function init() {
   );
 
   // 위치를 지정하지 않으면 원점?에 놓이게 됨 -> 카메라가 담을 수 없는 상태
-  camera.position.z = 5;
+  camera.position.z = 100;
 
   /**  큐브맵 텍스쳐를 이용한 3차원 공간 표현 1 */
   // const controls = new OrbitControls(camera, renderer.domElement);
@@ -84,8 +86,30 @@ function init() {
 
   const textureLoader = new THREE.TextureLoader();
   const texture = textureLoader.load("assets/textures/village.jpg");
-  texture.mapping = THREE.EquirectangularReflectionMapping; // 2차원 이미지 -> 3차원
+  texture.mapping = THREE.EquirectangularRefractionMapping; // 2차원 이미지 -> 3차원
   scene.background = texture;
+
+  const sphereGeometry = new THREE.SphereGeometry(30, 50, 50);
+  const sphereMaterial = new THREE.MeshBasicMaterial({
+    envMap: texture,
+    reflectivity: 0.5,
+  });
+
+  const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+  scene.add(sphere);
+
+  gui
+    .add(texture, "mapping", {
+      Reflection: THREE.EquirectangularReflectionMapping,
+      Refraction: THREE.EquirectangularRefractionMapping,
+    })
+    .onChange(() => {
+      sphereMaterial.needsUpdate = true;
+    });
+
+  gui.add(sphereMaterial, "reflectivity").min(0).max(1).step(0.01);
+  gui.add(sphereMaterial, "refractionRatio").min(0).max(1).step(0.1);
 
   render(); // 아래의 render 함수 호출
 
