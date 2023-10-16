@@ -56,7 +56,6 @@ async function init() {
 
   const gltf = await gltfLoader.loadAsync("models/character.gltf");
   const model = gltf.scene;
-  console.log(gltf);
 
   model.scale.set(0.1, 0.1, 0.1);
   model.traverse((object) => {
@@ -131,6 +130,10 @@ async function init() {
     currentAction.play();
   }
 
+  const raycaster = new THREE.Raycaster();
+  // 클릭 지점 (2차원 -> Vector2)
+  const pointer = new THREE.Vector2();
+
   const clock = new THREE.Clock();
 
   render(); // 아래의 render 함수 호출
@@ -153,5 +156,25 @@ async function init() {
     renderer.render(scene, camera); // render
   }
 
+  function handlePointerDown(event) {
+    // pointer는 상대적 좌표 (-1 ~ 1 사이)
+    pointer.x = (event.clientX / window.innerWidth - 0.5) * 2;
+    pointer.y = -(event.clientY / window.innerHeight - 0.5) * 2;
+
+    // 클릭한 지점과 카메라의 위치를 이어서 광선을 쏜다
+    raycaster.setFromCamera(pointer, camera);
+
+    // 광선이 가닿는 모든 물체를 반환한다
+    const intersects = raycaster.intersectObjects(scene.children); // 교차점 정보 얻기
+
+    // 제일 처음 광선에 맞은 물체를 가져온다
+    const object = intersects[0].object;
+
+    if (object?.name === "Ch14") {
+      object.material.color.set(0x00aaac);
+    }
+  }
+
   window.addEventListener("resize", handleResize);
+  window.addEventListener("pointerdown", handlePointerDown);
 }
