@@ -56,6 +56,7 @@ async function init() {
 
   const gltf = await gltfLoader.loadAsync("models/character.gltf");
   const model = gltf.scene;
+  console.log(gltf);
 
   model.scale.set(0.1, 0.1, 0.1);
   model.traverse((object) => {
@@ -92,45 +93,30 @@ async function init() {
 
   spotlight.position.set(0, 20, 0);
 
-  scene.add(spotlight);
-
   spotlight.castShadow = true;
   spotlight.shadow.mapSize.width = 1024;
   spotlight.shadow.mapSize.height = 1024;
   spotlight.shadow.radius = 8;
 
-  const spotlightFolder = gui.addFolder("Spotlight Settings");
+  scene.add(spotlight);
 
-  // Spotlight 빛의 세기 설정
-  const intensityController = spotlightFolder
-    .add(spotlight, "intensity", 0, 200)
-    .name("Intensity");
+  // 애니메이션 재생을 위한 믹서
+  const mixer = new THREE.AnimationMixer(model);
 
-  // Spotlight 빛의 범위 설정
-  const distanceController = spotlightFolder
-    .add(spotlight, "distance", 0, 200)
-    .name("Distance");
+  const hasAnimation = gltf.animations.length !== 0;
 
-  // Spotlight 빛의 각도 설정
-  const angleController = spotlightFolder
-    .add(spotlight, "angle", 0, Math.PI)
-    .name("Angle");
+  if (hasAnimation) {
+    const action = mixer.clipAction(gltf.animations[0]);
+    action.play();
+  }
 
-  intensityController.onChange(function (value) {
-    spotlight.intensity = value;
-  });
-
-  distanceController.onChange(function (value) {
-    spotlight.distance = value;
-  });
-
-  angleController.onChange(function (value) {
-    spotlight.angle = value;
-  });
+  const clock = new THREE.Clock();
 
   render(); // 아래의 render 함수 호출
 
   function render() {
+    const delta = clock.getDelta();
+    mixer.update(delta);
     controls.update();
 
     renderer.render(scene, camera); // 새로 렌더한다
