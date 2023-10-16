@@ -106,6 +106,8 @@ async function init() {
   let currentAction;
 
   const combatAnimations = gltf.animations.slice(0, 4);
+  const dancingAnimations = gltf.animations.slice(4);
+
   combatAnimations.forEach((animation) => {
     const button = document.createElement("button");
     button.innerText = animation.name;
@@ -171,7 +173,30 @@ async function init() {
     const object = intersects[0].object;
 
     if (object?.name === "Ch14") {
-      object.material.color.set(0x00aaac);
+      const previousAction = currentAction;
+
+      const index = Math.round(Math.random() * (dancingAnimations.length - 1));
+
+      currentAction = mixer.clipAction(dancingAnimations[index]);
+      // 한 번만 재생한다
+      currentAction.loop = THREE.LoopOnce;
+      // 마지막 프레임에서 멈춘다
+      currentAction.clampWhenFinished = true;
+
+      // 다시 idle 상태로 돌아간다
+      function handleFinished() {
+        const previouseAction = currentAction;
+        currentAction = mixer.clipAction(combatAnimations[0]);
+        previouseAction.fadeOut(0.5);
+        currentAction.reset().fadeIn(0.5).play();
+      }
+
+      mixer.addEventListener("finished", handleFinished);
+
+      if (previousAction !== currentAction) {
+        previousAction.fadeOut(0.5); // 0.5초에 걸쳐 중지시킨다
+        currentAction.reset().fadeIn(0.5).play(); // 새로운 애니메이션을 fade-in 재생
+      }
     }
   }
 
