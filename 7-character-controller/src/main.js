@@ -36,7 +36,7 @@ async function init() {
   controls.minDistance = 15;
   controls.maxDistance = 25;
   controls.minPolarAngle = Math.PI / 4;
-  controls.maxPolarAngle = Math.PI / 3;
+  controls.maxPolarAngle = Math.PI / 2;
 
   const progressBar = document.querySelector("#progress-bar");
   const progressBarContainer = document.querySelector(
@@ -103,11 +103,32 @@ async function init() {
   // 애니메이션 재생을 위한 믹서
   const mixer = new THREE.AnimationMixer(model);
 
+  const buttons = document.querySelector(".actions");
+  let currentAction;
+
+  const combatAnimations = gltf.animations.slice(0, 4);
+  combatAnimations.forEach((animation) => {
+    const button = document.createElement("button");
+    button.innerText = animation.name;
+    buttons.appendChild(button);
+    button.addEventListener("click", () => {
+      const previousAction = currentAction;
+
+      currentAction = mixer.clipAction(animation);
+      // 해당 애니메이션을 제어하기 위한 THREE.AnimationAction 객체를 반환
+
+      if (previousAction !== currentAction) {
+        previousAction.fadeOut(0.5); // 0.5초에 걸쳐 중지시킨다
+        currentAction.reset().fadeIn(0.5).play(); // 새로운 애니메이션을 fade-in 재생
+      }
+    });
+  });
+
   const hasAnimation = gltf.animations.length !== 0;
 
   if (hasAnimation) {
-    const action = mixer.clipAction(gltf.animations[0]);
-    action.play();
+    currentAction = mixer.clipAction(gltf.animations[0]);
+    currentAction.play();
   }
 
   const clock = new THREE.Clock();
